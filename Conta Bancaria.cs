@@ -97,11 +97,7 @@ class Program
                         Console.WriteLine("Digite o nome do Titular: ");
                         string titularCorrente = Console.ReadLine();
                         Console.WriteLine("Digite o numero da conta: ");
-                        int numeroContaCorrente = int.Parse(Console.ReadLine());
-                        do
-                        {
-                            
-                        }
+                        decimal numeroContaCorrente = decimal.Parse(Console.ReadLine());
                         ContaCorrente contaCorrente = new ContaCorrente(numeroContaCorrente, titularCorrente, 1000.00m);
                         contaCorrente.Sacar(200.00m);
                         Console.WriteLine($"Saldo Conta Corrente: {contaCorrente.Saldo}");
@@ -111,7 +107,7 @@ class Program
                         Console.WriteLine("Digite o nome do Titular: ");
                         string titularPoupanca = Console.ReadLine();
                         Console.WriteLine("Digite o numero da conta: ");
-                        int numeroContaPoupanca = int.Parse(Console.ReadLine());
+                       decimal numeroContaPoupanca = decimal.Parse(Console.ReadLine());
                         ContaPoupanca contaPoupanca = new ContaPoupanca(numeroContaPoupanca, titularPoupanca, 1500.00m);
                         contaPoupanca.AplicarRendimento(0.05m);
                         Console.WriteLine($"Saldo Conta Poupança: {contaPoupanca.Saldo}");
@@ -121,7 +117,7 @@ class Program
                         Console.WriteLine("Digite o nome do Titular: ");
                         string titularEmpresarial = Console.ReadLine();
                         Console.WriteLine("Digite o numero da conta: ");
-                        int numeroContaEmpresarial = int.Parse(Console.ReadLine());
+                        decimal numeroContaEmpresarial = decimal.Parse(Console.ReadLine());
                         ContaEmpresarial contaEmpresarial = new ContaEmpresarial(numeroContaEmpresarial, titularEmpresarial, 5000.00m);
                         contaEmpresarial.DefinirLimiteEmprestimo(2000.00m);
                         contaEmpresarial.SolicitarEmprestimo(1500.00m);
