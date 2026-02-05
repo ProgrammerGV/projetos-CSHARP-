@@ -74,6 +74,15 @@ public abstract class ContaBancaria
         Saldo -= valor;
     }
 
+    public virtual void Depositar(decimal valor)
+    {
+        if (valor <= 0)
+        {
+            throw new ArgumentException("O valor do depósito deve ser positivo.");
+        }
+        Saldo += valor;
+    }
+
     public virtual void SetNumeroConta(int numero)
     {
         NumeroConta = numero;
@@ -183,7 +192,7 @@ class Program
                                 conta.NumeroConta == numeroBusca)
                             {
                                 contaEncontrada = (ContaCorrente)conta;
-                                break; 
+                                break;
                             }
                         }
 
@@ -196,7 +205,7 @@ class Program
                                 Console.WriteLine($"Saldo Atual: {contaEncontrada.Saldo:C}");
                                 Console.WriteLine("1 - Sacar");
                                 Console.WriteLine("2 - Depositar");
-                                Console.WriteLine("3 - Voltar ao menu principal");
+                                Console.WriteLine("3 - Voltar ao menu principal"); 
                                 Console.Write("Opção: ");
                                 opSubMenu = Console.ReadLine();
 
@@ -208,7 +217,10 @@ class Program
                                         try
                                         {
                                             contaEncontrada.Sacar(valorSaque);
-                                            Console.WriteLine($"Sucesso! Novo saldo: {contaEncontrada.Saldo:C}");
+
+                                            Console.WriteLine($" Saque de {valorSaque:C} realizado com sucesso!");
+                                            Console.WriteLine($" Taxa de saque de R$ 5,00 foi debitada.");
+                                            Console.WriteLine($" Novo saldo: {contaEncontrada.Saldo:C}");
                                         }
                                         catch (InvalidOperationException ex)
                                         {
@@ -222,14 +234,31 @@ class Program
                                 }
                                 else if (opSubMenu == "2")
                                 {
-                                    Console.WriteLine("Funcionalidade de Depósito ainda não implementada.");
+                                    Console.WriteLine("Digite o valor do deposito a ser efetuado: ");
+                                    if (decimal.TryParse(Console.ReadLine(), out decimal valorDeposito))
+                                    {
+                                        try
+                                        {
+                                            contaEncontrada.Depositar(valorDeposito);
+                                            Console.WriteLine($" Depósito de {valorDeposito:C} realizado com sucesso!");
+                                            Console.WriteLine($" Novo saldo: {contaEncontrada.Saldo:C}");
+                                        }
+                                        catch (ArgumentException ex)
+                                        {
+                                            Console.WriteLine($"Erro no depósito: {ex.Message}");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Valor inválido.");
+                                    }
                                 }
 
-                            } while (opSubMenu != "3"); 
+                            } while (opSubMenu != "3");
                         }
                         else
                         {
-                            Console.WriteLine("❌ Erro: Conta não encontrada! Verifique o nome e o número.");
+                            Console.WriteLine(" Erro: Conta não encontrada! Verifique o nome e o número.");
                         }
                     }
                     else
