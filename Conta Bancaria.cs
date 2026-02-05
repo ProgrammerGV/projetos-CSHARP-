@@ -169,27 +169,28 @@ class Program
             opcao = Console.ReadLine();
             Console.WriteLine();
             switch (opcao)
-                    {
-                    case "0":
-                        Console.WriteLine("Saindo...");
-                        break;
+            {
+                case "0":
+                    Console.WriteLine("Saindo...");
+                    break;
 
                 case "1":
+                    { 
                     Console.WriteLine("--- Acesso à Conta Corrente ---");
 
                     Console.WriteLine("Digite o nome do Titular:");
-                    string? nomeBusca = Console.ReadLine();
+                    string? nomeCorrente = Console.ReadLine();
 
                     Console.WriteLine("Digite o número da conta:");
-                    if (int.TryParse(Console.ReadLine(), out int numeroBusca))
+                    if (int.TryParse(Console.ReadLine(), out int numeroCorrente))
                     {
                         ContaCorrente? contaEncontrada = null;
 
                         foreach (var conta in listaDeContas)
                         {
                             if (conta is ContaCorrente &&
-                                conta.Titular == nomeBusca &&
-                                conta.NumeroConta == numeroBusca)
+                                conta.Titular == nomeCorrente &&
+                                conta.NumeroConta == numeroCorrente)
                             {
                                 contaEncontrada = (ContaCorrente)conta;
                                 break;
@@ -205,7 +206,7 @@ class Program
                                 Console.WriteLine($"Saldo Atual: {contaEncontrada.Saldo:C}");
                                 Console.WriteLine("1 - Sacar");
                                 Console.WriteLine("2 - Depositar");
-                                Console.WriteLine("3 - Voltar ao menu principal"); 
+                                Console.WriteLine("3 - Voltar ao menu principal");
                                 Console.Write("Opção: ");
                                 opSubMenu = Console.ReadLine();
 
@@ -265,12 +266,106 @@ class Program
                     {
                         Console.WriteLine("Número de conta inválido.");
                     }
+            }
                         break;
                 case "2":
-                        
-                        break;
+                    {
+                        Console.WriteLine("--- Acesso à Conta Poupança ---");
+                        Console.WriteLine("Digite o nome do Titular:");
+                        string? nomePoupanca = Console.ReadLine();
 
-                    case "3":
+                        Console.WriteLine("Digite o número da conta:");
+                        if (int.TryParse(Console.ReadLine(), out int numeroPoupanca))
+                        {
+                            // CORREÇÃO 1: A variável deve ser do tipo ContaPoupanca para acessar o método AplicarRendimento
+                            ContaPoupanca? contaEncontrada = null;
+
+                            foreach (var conta in listaDeContas)
+                            {
+                                // CORREÇÃO 2: Verificamos se é "is ContaPoupanca"
+                                if (conta is ContaPoupanca &&
+                                    conta.Titular == nomePoupanca &&
+                                    conta.NumeroConta == numeroPoupanca)
+                                {
+                                    contaEncontrada = (ContaPoupanca)conta; // Cast correto
+                                    break;
+                                }
+                            }
+
+                            if (contaEncontrada != null)
+                            {
+                                string? opSubMenu;
+                                // ADIÇÃO 1: O laço do-while mantém o usuário logado na conta
+                                do
+                                {
+                                    Console.WriteLine($"\n--- Conta Poupança: {contaEncontrada.NumeroConta} | Titular: {contaEncontrada.Titular} ---");
+                                    Console.WriteLine($"Saldo Atual: {contaEncontrada.Saldo:C}");
+                                    Console.WriteLine("1 - Sacar");
+                                    Console.WriteLine("2 - Depositar");
+                                    Console.WriteLine("3 - Aplicar Rendimento"); // <--- FUNCIONALIDADE EXCLUSIVA
+                                    Console.WriteLine("4 - Voltar ao menu principal");
+                                    Console.Write("Opção: ");
+                                    opSubMenu = Console.ReadLine();
+
+                                    // ADIÇÃO 2: Reutilizamos a lógica de Saque (herdada da classe base)
+                                    if (opSubMenu == "1")
+                                    {
+                                        Console.WriteLine("Valor do saque: ");
+                                        if (decimal.TryParse(Console.ReadLine(), out decimal valor))
+                                        {
+                                            try
+                                            {
+                                                contaEncontrada.Sacar(valor);
+                                                Console.WriteLine($"Saque realizado! Novo saldo: {contaEncontrada.Saldo:C}");
+                                            }
+                                            catch (Exception ex) { Console.WriteLine(ex.Message); }
+                                        }
+                                    }
+                                    // ADIÇÃO 3: Reutilizamos a lógica de Depósito
+                                    else if (opSubMenu == "2")
+                                    {
+                                        Console.WriteLine("Valor do depósito: ");
+                                        if (decimal.TryParse(Console.ReadLine(), out decimal valor))
+                                        {
+                                            try
+                                            {
+                                                contaEncontrada.Depositar(valor);
+                                                Console.WriteLine($"Depósito realizado! Novo saldo: {contaEncontrada.Saldo:C}");
+                                            }
+                                            catch (Exception ex) { Console.WriteLine(ex.Message); }
+                                        }
+                                    }
+                                    // ADIÇÃO 4: Lógica exclusiva da Poupança
+                                    else if (opSubMenu == "3")
+                                    {
+                                        Console.WriteLine("Digite a taxa de rendimento (ex: 0,05 para 5%): ");
+                                        if (decimal.TryParse(Console.ReadLine(), out decimal taxa))
+                                        {
+                                            // Aqui chamamos o método que SÓ existe na classe ContaPoupanca
+                                            contaEncontrada.AplicarRendimento(taxa);
+                                            Console.WriteLine($"Rendimento aplicado! Novo saldo: {contaEncontrada.Saldo:C}");
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Taxa inválida.");
+                                        }
+                                    }
+
+                                } while (opSubMenu != "4"); // Sai quando digita 4
+                            }
+                            else
+                            {
+                                Console.WriteLine("❌ Erro: Conta Poupança não encontrada.");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Número inválido.");
+                        }
+                    }
+                    break;
+
+                case "3":
                         
                         break;
 
