@@ -134,7 +134,9 @@ public class ContaEmpresarial : ContaBancaria
 {
     public ContaEmpresarial(int numeroConta, string titular, decimal saldoInicial, string tipoConta)
         : base(numeroConta, titular, saldoInicial, tipoConta)
-    { }
+    {
+        LimiteEmprestimo = 1000.00m;
+    }
     public decimal LimiteEmprestimo { get; private set; }
     public decimal LimiteEmprestimoEmUso { get; private set; }
     public void DefinirLimiteEmprestimo(decimal limite)
@@ -160,14 +162,14 @@ class Program
         string? opcao;
         do
         {
-            Console.WriteLine("Escolha uma opção:");
             Console.WriteLine("1 - Conta Corrente");
             Console.WriteLine("2 - Conta Poupança");
             Console.WriteLine("3 - Conta Empresarial"); 
             Console.WriteLine("4 - Abrir conta"); 
             Console.WriteLine("0 - Sair");
+            Console.Write("\nEscolha uma opção: ");
             opcao = Console.ReadLine();
-            Console.WriteLine();
+            Console.Clear();
             switch (opcao)
             {
                 case "0":
@@ -178,10 +180,10 @@ class Program
                     { 
                     Console.WriteLine("--- Acesso à Conta Corrente ---");
 
-                    Console.WriteLine("Digite o nome do Titular:");
+                    Console.Write("Digite o nome do Titular: ");
                     string? nomeCorrente = Console.ReadLine();
 
-                    Console.WriteLine("Digite o número da conta:");
+                    Console.Write("Digite o número da conta: ");
                     if (int.TryParse(Console.ReadLine(), out int numeroCorrente))
                     {
                         ContaCorrente? contaEncontrada = null;
@@ -202,6 +204,7 @@ class Program
                             string? opSubMenu;
                             do
                             {
+                                Console.Clear();
                                 Console.WriteLine($"\n--- Conta: {contaEncontrada.NumeroConta} | Titular: {contaEncontrada.Titular} ---");
                                 Console.WriteLine($"Saldo Atual: {contaEncontrada.Saldo:C}");
                                 Console.WriteLine("1 - Sacar");
@@ -209,10 +212,11 @@ class Program
                                 Console.WriteLine("3 - Voltar ao menu principal");
                                 Console.Write("Opção: ");
                                 opSubMenu = Console.ReadLine();
+                                Console.Clear();
 
-                                if (opSubMenu == "1")
+                                    if (opSubMenu == "1")
                                 {
-                                    Console.WriteLine("Digite o valor para saque: ");
+                                    Console.Write("Digite o valor para saque: ");
                                     if (decimal.TryParse(Console.ReadLine(), out decimal valorSaque))
                                     {
                                         try
@@ -235,7 +239,7 @@ class Program
                                 }
                                 else if (opSubMenu == "2")
                                 {
-                                    Console.WriteLine("Digite o valor do deposito a ser efetuado: ");
+                                    Console.Write("Digite o valor do deposito a ser efetuado: ");
                                     if (decimal.TryParse(Console.ReadLine(), out decimal valorDeposito))
                                     {
                                         try
@@ -259,35 +263,35 @@ class Program
                         }
                         else
                         {
+                            Console.Clear();
                             Console.WriteLine(" Erro: Conta não encontrada! Verifique o nome e o número.");
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Número de conta inválido.");
+                            Console.Clear();
+                            Console.WriteLine("Número de conta inválido.");
                     }
             }
                         break;
                 case "2":
                     {
                         Console.WriteLine("--- Acesso à Conta Poupança ---");
-                        Console.WriteLine("Digite o nome do Titular:");
+                        Console.Write("Digite o nome do Titular: ");
                         string? nomePoupanca = Console.ReadLine();
 
-                        Console.WriteLine("Digite o número da conta:");
+                        Console.Write("Digite o número da conta: ");
                         if (int.TryParse(Console.ReadLine(), out int numeroPoupanca))
                         {
-                            // CORREÇÃO 1: A variável deve ser do tipo ContaPoupanca para acessar o método AplicarRendimento
                             ContaPoupanca? contaEncontrada = null;
 
                             foreach (var conta in listaDeContas)
                             {
-                                // CORREÇÃO 2: Verificamos se é "is ContaPoupanca"
                                 if (conta is ContaPoupanca &&
                                     conta.Titular == nomePoupanca &&
                                     conta.NumeroConta == numeroPoupanca)
                                 {
-                                    contaEncontrada = (ContaPoupanca)conta; // Cast correto
+                                    contaEncontrada = (ContaPoupanca)conta; 
                                     break;
                                 }
                             }
@@ -295,22 +299,20 @@ class Program
                             if (contaEncontrada != null)
                             {
                                 string? opSubMenu;
-                                // ADIÇÃO 1: O laço do-while mantém o usuário logado na conta
                                 do
                                 {
                                     Console.WriteLine($"\n--- Conta Poupança: {contaEncontrada.NumeroConta} | Titular: {contaEncontrada.Titular} ---");
                                     Console.WriteLine($"Saldo Atual: {contaEncontrada.Saldo:C}");
                                     Console.WriteLine("1 - Sacar");
                                     Console.WriteLine("2 - Depositar");
-                                    Console.WriteLine("3 - Aplicar Rendimento"); // <--- FUNCIONALIDADE EXCLUSIVA
+                                    Console.WriteLine("3 - Aplicar Rendimento"); 
                                     Console.WriteLine("4 - Voltar ao menu principal");
                                     Console.Write("Opção: ");
                                     opSubMenu = Console.ReadLine();
 
-                                    // ADIÇÃO 2: Reutilizamos a lógica de Saque (herdada da classe base)
                                     if (opSubMenu == "1")
                                     {
-                                        Console.WriteLine("Valor do saque: ");
+                                        Console.Write("Valor do saque: ");
                                         if (decimal.TryParse(Console.ReadLine(), out decimal valor))
                                         {
                                             try
@@ -321,10 +323,9 @@ class Program
                                             catch (Exception ex) { Console.WriteLine(ex.Message); }
                                         }
                                     }
-                                    // ADIÇÃO 3: Reutilizamos a lógica de Depósito
                                     else if (opSubMenu == "2")
                                     {
-                                        Console.WriteLine("Valor do depósito: ");
+                                        Console.Write("Valor do depósito: ");
                                         if (decimal.TryParse(Console.ReadLine(), out decimal valor))
                                         {
                                             try
@@ -335,13 +336,11 @@ class Program
                                             catch (Exception ex) { Console.WriteLine(ex.Message); }
                                         }
                                     }
-                                    // ADIÇÃO 4: Lógica exclusiva da Poupança
                                     else if (opSubMenu == "3")
                                     {
-                                        Console.WriteLine("Digite a taxa de rendimento (ex: 0,05 para 5%): ");
+                                        Console.Write("Digite a taxa de rendimento (ex: 0,05 para 5%): ");
                                         if (decimal.TryParse(Console.ReadLine(), out decimal taxa))
                                         {
-                                            // Aqui chamamos o método que SÓ existe na classe ContaPoupanca
                                             contaEncontrada.AplicarRendimento(taxa);
                                             Console.WriteLine($"Rendimento aplicado! Novo saldo: {contaEncontrada.Saldo:C}");
                                         }
@@ -351,32 +350,122 @@ class Program
                                         }
                                     }
 
-                                } while (opSubMenu != "4"); // Sai quando digita 4
+                                } while (opSubMenu != "4");
                             }
                             else
                             {
-                                Console.WriteLine("❌ Erro: Conta Poupança não encontrada.");
+                                Console.Clear();
+                                Console.WriteLine(" Erro: Conta Poupança não encontrada.");
                             }
                         }
                         else
                         {
+                            Console.Clear();
                             Console.WriteLine("Número inválido.");
                         }
                     }
                     break;
 
                 case "3":
-                        
-                        break;
+                    {
+                        Console.WriteLine("--- Acesso à Conta Empresarial ---");
+                        Console.Write("Digite o nome do titular: ");
+                        string? nomeEmpresarial = Console.ReadLine();
+
+                        Console.Write("Digite o número da conta: ");
+                        if (int.TryParse(Console.ReadLine(), out int numeroEmpresarial))
+                        {
+                            ContaEmpresarial? contaEncontrada = null;
+                            foreach (var conta in listaDeContas)
+                            {
+                                if (conta is ContaEmpresarial &&
+                                    conta.Titular == nomeEmpresarial &&
+                                    conta.NumeroConta == numeroEmpresarial)
+                                {
+                                    contaEncontrada = (ContaEmpresarial)conta;
+                                    break;
+                                }
+                            }
+                            if (contaEncontrada != null)
+                            {
+                                string? opSubMenu;
+                                do
+                                {
+                                    Console.WriteLine($"\n--- Conta Empresarial: {contaEncontrada.NumeroConta} | Titular: {contaEncontrada.Titular} ---");
+                                    Console.WriteLine($"Saldo Atual: {contaEncontrada.Saldo:C}");
+                                    decimal disponivel = contaEncontrada.LimiteEmprestimo - contaEncontrada.LimiteEmprestimoEmUso;
+                                    Console.WriteLine($"Limite para Empréstimo: {disponivel:C}");
+                                    Console.WriteLine("1 - Sacar");
+                                    Console.WriteLine("2 - Depositar");
+                                    Console.WriteLine("3 - Solicitar Empréstimo");
+                                    Console.WriteLine("4 - Voltar ao menu principal");
+                                    Console.Write("Opção: ");
+                                    opSubMenu = Console.ReadLine();
+
+                                    if (opSubMenu == "1")
+                                    {
+                                        Console.Write("Valor do Saque: ");
+                                        if (decimal.TryParse(Console.ReadLine(), out decimal valorSaque))
+                                        {
+                                            try
+                                            {
+                                                contaEncontrada.Sacar(valorSaque);
+                                                Console.WriteLine($"Saque realizado! Novo saldo: {contaEncontrada.Saldo:C}");
+                                            }
+                                            catch (Exception ex) { Console.WriteLine(ex.Message); }
+                                        }
+                                    }
+                                    else if (opSubMenu == "2")
+                                    {
+                                        Console.Write("Valor do Depósito: ");
+                                        if (decimal.TryParse(Console.ReadLine(), out decimal valorDeposito))
+                                        {
+                                            try
+                                            {
+                                                contaEncontrada.Depositar(valorDeposito);
+                                                Console.WriteLine($"Depósito realizado! Novo saldo: {contaEncontrada.Saldo:C}");
+                                            }
+                                            catch (Exception ex) { Console.WriteLine(ex.Message); }
+                                        }
+                                    }
+                                    else if (opSubMenu == "3")
+                                    {
+                                        Console.Write("Valor do Empréstimo: ");
+                                        if (decimal.TryParse(Console.ReadLine(), out decimal valorEmprestimo))
+                                        {
+                                            try
+                                            {
+                                                contaEncontrada.SolicitarEmprestimo(valorEmprestimo);
+                                                Console.WriteLine($"Empréstimo aprovado! Novo saldo: {contaEncontrada.Saldo:C}");
+                                            }
+                                            catch (Exception ex) { Console.WriteLine(ex.Message); }
+                                        }
+                                    }
+                                } while (opSubMenu != "4");
+                            }
+                            else
+                            {
+                                Console.Clear();
+                                Console.WriteLine(" Erro: Conta Empresarial não encontrada.");
+                            }
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Número de conta inválido.");
+                        }
+                    }
+                    break;
 
                     case "4":
-                    Console.WriteLine("Selecione o tipo de conta: ");
+
                     Console.WriteLine("1 - Conta Corrente");
                     Console.WriteLine("2 - Conta Poupança");
                     Console.WriteLine("3 - Conta Empresarial");
+                    Console.Write("Selecione o tipo de conta: ");
                     string? tipoOpcao = Console.ReadLine();
-
-                    Console.WriteLine("Digite seu nome: ");
+                    Console.Clear();
+                    Console.Write("Digite seu nome: ");
                     string? nomeTitular = Console.ReadLine();
 
                     string tipoTexto = "";
@@ -423,7 +512,7 @@ class Program
                             listaDeContas.Add(novaConta);
                         }
 
-                        Console.WriteLine($"{tipoTexto} criada com sucesso! Número da conta: {novoNumero}");
+                        Console.WriteLine($"{tipoTexto} criada com sucesso! Número da conta: {novoNumero}\n");
                     }
 
                     break;
