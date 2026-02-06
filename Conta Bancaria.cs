@@ -45,8 +45,8 @@
 //    }
 //} Fim da atividade;
 
-
-// Sprint 01    
+using System.Threading;
+// Sprint 01 
 public abstract class ContaBancaria
 {
     public int NumeroConta { get; private set; }
@@ -263,8 +263,9 @@ class Program
                         }
                         else
                         {
+                            Console.WriteLine("\nErro: Conta corrente não encontrada! Verifique o nome e o número.");
+                            Thread.Sleep(7000);
                             Console.Clear();
-                            Console.WriteLine(" Erro: Conta não encontrada! Verifique o nome e o número.");
                         }
                     }
                     else
