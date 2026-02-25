@@ -1,9 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Threading;
 
+public interface ITransacao
+{
+    void Sacar(decimal valor);
+    void Depositar(decimal valor);
+}
 
-public abstract class ContaBancaria
+public abstract class ContaBancaria : ITransacao
 {
     public int NumeroConta { get; private set; }
     public string Titular { get; private set; }
@@ -22,7 +25,11 @@ public abstract class ContaBancaria
         TipoConta = tipoConta;
     }
 
-    protected ContaBancaria() { }
+    protected ContaBancaria() 
+    {
+        Titular = string.Empty;
+        TipoConta = string.Empty;
+    }
     public void IncrementarContador(string tipoConta)
     {
         if (tipoConta == "1") CountCorrente++;
@@ -43,7 +50,7 @@ public abstract class ContaBancaria
 
     protected virtual bool PodeSacar(decimal valor)
     {
-        if ( valor < 0)
+        if ( valor <= 0)
         {
             return false;
         }
@@ -73,12 +80,18 @@ public class ContaCorrente : ContaBancaria
 {
     public ContaCorrente(int numeroConta, string titular, decimal saldoInicial, string tipoConta)
         : base(numeroConta, titular, saldoInicial, tipoConta) { }
+    protected override bool PodeSacar(decimal valor)
+    {
+        if (valor <= 0) {
+            return false;
+            }
+        return Saldo >= (valor + 5.00m);
+    }
     public override void Sacar(decimal valor)
     {
-        if (!PodeSacar(valor)) {
-            throw new InvalidOperationException("Saldo insuficiente para saque, considerando a taxa de saque.");
-            }
-        Saldo -= valor + 5.00m;
+        if (!PodeSacar(valor))
+            throw new InvalidOperationException("Saldo insuficiente para saque (incluindo taxa de R$ 5,00).");
+        Saldo -= (valor + 5.00m);
     }
 }
 
@@ -87,7 +100,15 @@ public class ContaPoupanca : ContaBancaria
     public ContaPoupanca(int numeroConta, string titular, decimal saldoInicial, string tipoConta)
         : base(numeroConta, titular, saldoInicial, tipoConta) { }
 
-    public void AplicarRendimento(decimal taxa) => Saldo += Saldo * taxa;
+    public void AplicarRendimento(decimal taxa)
+    {
+        if (taxa <= 0 || taxa > 1)
+        {
+            throw new ArgumentException("A taxa de rendimento deve ser maior que 0 e no máximo 1 (100%).");
+        }
+
+        Saldo += Saldo * taxa;
+    }
 }
 
 public class ContaEmpresarial : ContaBancaria
@@ -102,11 +123,14 @@ public class ContaEmpresarial : ContaBancaria
 
     public void SolicitarEmprestimo(decimal valor)
     {
-        if (valor > (LimiteEmprestimo - LimiteEmprestimoEmUso))
-            throw new InvalidOperationException("Valor do empréstimo excede o limite disponível.");
+if (valor <= 0)
+        throw new ArgumentException("O valor do empréstimo deve ser maior que zero.");
 
-        LimiteEmprestimoEmUso += valor;
-        Saldo += valor;
+    if (valor > (LimiteEmprestimo - LimiteEmprestimoEmUso))
+        throw new InvalidOperationException("Valor do empréstimo excede o limite disponível.");
+
+    LimiteEmprestimoEmUso += valor;
+    Saldo += valor;
     }
 }
 
@@ -164,11 +188,18 @@ class Program
         Console.Write("Digite o nome do Titular: ");
         string? nome = Console.ReadLine();
 
+        if (string.IsNullOrWhiteSpace(nome))
+        {
+            Console.Clear();
+            Console.WriteLine("Nome inválido.");
+            return;
+        }
+
         Console.Write("Digite o número da conta: ");
         if (int.TryParse(Console.ReadLine(), out int numero))
         {
             var contaEncontrada = listaDeContas.Find(c =>
-                c.Titular == nome &&
+                c.Titular.Equals(nome?.Trim(), StringComparison.OrdinalIgnoreCase) &&
                 c.NumeroConta == numero &&
                 ((tipoContaDescricao == "Conta Corrente" && c is ContaCorrente) ||
                  (tipoContaDescricao == "Conta Poupança" && c is ContaPoupanca) ||
@@ -336,9 +367,15 @@ class Program
         }
 
         Console.Write("Digite seu nome: ");
-        string? nomeTitular = Console.ReadLine();
+        string? nomeTitular = Console.ReadLine()?.Trim();
 
-        if (listaDeContas.Exists(c => c.Titular == nomeTitular && c.TipoConta == tipoTexto))
+        if (string.IsNullOrWhiteSpace(nomeTitular))
+        {
+            Console.WriteLine("Erro: O nome do titular não pode ser vazio.");
+            return;
+        }
+
+        if (listaDeContas.Exists(c => c.Titular.Equals(nomeTitular, StringComparison.OrdinalIgnoreCase) && c.TipoConta == tipoTexto))
         {
             Console.WriteLine($"Erro: O cliente {nomeTitular} já possui uma {tipoTexto}.");
         }
